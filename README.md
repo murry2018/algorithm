@@ -24,6 +24,9 @@ readtables는 rutils의 핵심 기능으로, '슬롯 바인딩'이라는 기능�
 표현하게 해 줍니다. 이외에도 다양한 함수와 매크로를 제공하여
 알고리즘을 쉽게 이해할 수 있을 만큼 리습의 표현력을 크게 끌어올립니다.
 
+더 많은 기능은 [rutils 프로젝트 페이지](https://github.com/vseloved/rutils/blob/master/docs/tutorial.md)에서
+찾을 수 있습니다.
+
 ### rlwrap
 
 ```
@@ -56,7 +59,8 @@ Emacs SLIME, Vim SLIMV, Portacle 등이 있습니다.
 
 이 내용을 `~/.emacs` 혹은 `~/.emacs.d/init.el`에 저장하고 재시작합니다.
 
-리습 파일을 열고 `M-x slime`을 치면 슬라임 REPL이 로딩됩니다.
+리습 파일을 열고 `M-x slime`을 치면 슬라임 REPL이 로딩됩니다. 초기
+로딩에 시간이 조금 걸릴 수 있습니다.
 
 ```elisp
 ;; 패키지 아카이브 초기화
@@ -68,28 +72,26 @@ Emacs SLIME, Vim SLIMV, Portacle 등이 있습니다.
   (package-refresh-contents)
   (package-install 'use-package))
 
-;; company: 자동완성 프론트엔드
-;; flycheck: 문법 체크 프론트엔드
+;; company: 자동완성 프레임워크
 (use-package company
   :ensure t
   :config (global-company-mode 1))
-(use-package flycheck
-  :ensure t
-  :config (global-flycheck-mode 1))
 
 ;; SLIME과 company 백엔드 설정
+(use-package slime-company
+  :ensure t
+  :bind (:map company-active-map
+              ("C-n" . company-select-next)
+              ("C-p" . company-select-previous)
+              ("C-d" . company-show-doc-buffer)
+              ("M-." . company-show-location))
+  :config
+  (setq slime-company-completion 'fuzzy
+        slime-company-after-completion 'slime-company-just-one-space))
 (use-package slime
   :ensure t
   :config
   ;; change this value to actual implemenation!
-  (setq inferior-lisp-program "ecl")) 
-(use-package slime-company
-  :ensure t :after (slime company)
-  :config
-  (setq slime-company-completion 'fuzzy
-        slime-company-after-completion 'slime-company-just-one-space))
-(use-package slime-setup
-  :no-require t
-  :after (slime-company)
-  (slime-setup '(slime-fancy slime-company slime-quicklisp slime-asdf)))
+  (setq inferior-lisp-program "ecl")
+  (slime-setup '(slime-fancy slime-company slime-quicklisp slime-asdf))) 
 ```
